@@ -1,26 +1,17 @@
 #include <ESP8266WiFi.h>
 #include "definitions.h"
 #include <PubSubClient.h>
-  
-
 unsigned long previousMillis = 0;
 int tryCount= 0;
 int moisture = 0;
 char message_buff[100];
-
 IPAddress server(mqtt_host[0],mqtt_host[1],mqtt_host[2],mqtt_host[3]);
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 int watering = 0;
 int count = 0;
-    
 
-
-
-
-
-void doubleToString(double invalue, char* invVarName) { 
-  
+void doubleToString(double invalue, char* invVarName) {  
     int lengthBuffMqtt;
     if ( invalue > -10 && invalue < 0) {
       lengthBuffMqtt = 4;
@@ -62,20 +53,10 @@ client.subscribe(mqtt_sub_topic);
            // Wait 5 seconds before retrying
       delay(conectionTimeout*1000);
           }
-     
     }
-  }
-
-
-
-
-    
-  }
-
-  void callback(char* topic, byte* payload, unsigned int length) {
-  
-  
-  
+  }  
+ }
+void callback(char* topic, byte* payload, unsigned int length) {  
 int i = 0;
 for (i = 0; i < length; i++) {
     message_buff[i] = payload[i];
@@ -90,18 +71,12 @@ for (i = 0; i < length; i++) {
   Serial.print(message_buff);
   Serial.println();
   #endif
-
-  
-
-  
   if (msgString == "ON" ) {
     watering = 1;
   }else if(msgString == "OFF"){
     watering = 0;
     }
-
 }
-
 void setup() {
   #if SleepTest
 pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
@@ -115,7 +90,6 @@ Serial.begin(115200);
   digitalWrite(Out1, LOW);
 #if SleepTest
 pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
-
   #endif
   #if SerialDebug
   Serial.print("Connecting to ");
@@ -123,12 +97,9 @@ pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
   #endif
   client.setServer(server, 1883);
   client.setCallback(callback);
-
-  
   //WiFi.mode(WIFI_STA);
   WiFi.softAPdisconnect(true);
   WiFi.begin(ssid, password);
-  
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     #if SerialDebug
@@ -170,12 +141,10 @@ moisture = map(adcValue, 700,1024,100,0);
 digitalWrite(Out1, LOW );
 doubleToString(moisture, "Moisture_Node_1");
 #if SerialDebug
-      Serial.print("Mapped input value = ");
-     
-      Serial.println(moisture);
-      Serial.print("Analog input value = ");
-     
-      Serial.println(adcValue);
+  Serial.print("Mapped input value = ");
+  Serial.println(moisture);
+  Serial.print("Analog input value = ");
+  Serial.println(adcValue);
 #endif
  count++;
   }else if(count == 4){
@@ -183,8 +152,6 @@ doubleToString(moisture, "Moisture_Node_1");
   Serial.println("count = 4");
 #endif
     if(watering == 0){
- 
-
 #if SleepTest
 #if SerialDebug
   Serial.println("I'm awake, but I'm going into deep sleep mode for 1 minute");
@@ -197,12 +164,9 @@ doubleToString(moisture, "Moisture_Node_1");
    ESP.deepSleep(sleepNotWateringTimeS * 60000000); 
 #endif  
     }else{
-     
-
 #if SleepTest
  #if SerialDebug
   Serial.println("I'm awake, but I'm going into deep sleep mode for 30 seconds");
-  
 #endif
  ESP.deepSleep(sleepWateringTestTimeS * 60000000); // Test 
 #else
@@ -211,11 +175,8 @@ Serial.println("I'm awake, but I'm going into deep sleep mode for 5 minutes");
 #endif
       }
    }
-
-
   if(currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;     
 count++;
-}
- 
+  }
 }
